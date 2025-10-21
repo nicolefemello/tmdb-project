@@ -14,13 +14,28 @@ const router = createRouter({
         },
         {
           path: '/movies',
-          name: 'Movies',
+          name: 'movies',
           component: () => import('../views/MoviesView.vue'),
         },
         {
           path: '/movies/details/:id',
           name: 'movies-details',
           component: () => import('../views/MoviesDetailsView.vue'),
+        },
+        {
+          path: '/popular',
+          name: 'popular',
+          component: () => import('../views/HomeView.vue'),
+        },
+        {
+          path: '/showtimes',
+          name: 'showtimes',
+          component: () => import('../views/HomeView.vue'),
+        },
+        {
+          path: '/my-tickets',
+          name: 'my-tickets',
+          component: () => import('../views/HomeView.vue'),
         },
       ],
     },

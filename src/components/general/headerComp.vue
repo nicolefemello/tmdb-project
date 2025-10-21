@@ -5,7 +5,7 @@ const menu = [
     { name: 'MOVIES', link: '/movies' },
     { name: 'POPULAR', link: '/popular' },
     { name: 'SHOWTIMES', link: '/showtimes' },
-    { name: 'MY LIST', link: '/my-list' },
+    { name: 'MY TICKETS', link: '/my-tickets' },
   ],
   [
     { icon: 'search', link: '/' },

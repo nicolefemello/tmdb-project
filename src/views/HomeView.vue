@@ -9,8 +9,8 @@ let intervalId: number | undefined
 
 const startCarousel = () => {
   intervalId = setInterval(() => {
-    if (movies.value.length > 0) {
-      currentIndex.value = (currentIndex.value + 1) % movies.value.length
+    if (store.movies.length > 0) {
+      currentIndex.value = (currentIndex.value + 1) % store.movies.length
     }
   }, 4000)
 }

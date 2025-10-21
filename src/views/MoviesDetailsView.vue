@@ -11,6 +11,13 @@ const genreStore = useGenreStore()
 
 const trailerUrl = ref<string | null>(null)
 const runtime = ref<number | null>(null)
+const director = ref<string | null>(null)
+const castList = ref<{ name: string; character: string; profile_path: string | null }[]>([])
+const selectedMenuId = ref(1)
+
+const selectMenu = (id: number) => {
+  selectedMenuId.value = id
+}
 
 onMounted(async () => {
   await Promise.all([movieStore.fetchMovies(), genreStore.getAllGenres('movie')])
@@ -28,17 +35,34 @@ onMounted(async () => {
 
     const detailsResponse = await api.get(`/movie/${movieId}?language=en-US`)
     runtime.value = detailsResponse.data.runtime
+
+    const creditsResponse = await api.get(`/movie/${movieId}/credits?language=en-US`)
+    const movieDirector = creditsResponse.data.crew.find((member: any) => member.job === 'Director')
+    director.value = movieDirector ? movieDirector.name : 'Desconhecido'
+    castList.value = creditsResponse.data.cast.map((actor: any) => ({
+      name: actor.name,
+      character: actor.character,
+      profile_path: actor.profile_path,
+    }))
   } catch (error) {
     console.error('Erro ao buscar informações do filme:', error)
   }
 })
 
 const movie = computed(() => movieStore.movies.find((m) => m.id === Number(route.params.id)))
+
+const menu = [
+  { id: 1, section: 'Visão Geral' },
+  { id: 2, section: 'Horários' },
+  { id: 3, section: 'Elenco' },
+]
+
+const scheduleContent = ref('Informações sobre horários de exibição aqui.')
 </script>
 
 <template>
   <div v-if="movie">
-    <div class="relative h-[80vh] overflow-hidden">
+    <section class="relative h-[80vh] overflow-hidden">
       <img
         :src="`https://image.tmdb.org/t/p/original${movie.backdrop_path}`"
         :alt="movie.title"
@@ -54,8 +78,8 @@ const movie = computed(() => movieStore.movies.find((m) => m.id === Number(route
         >
           {{ genreStore.getGenreName(genre_id) }}
         </span>
-        <h1 class="text-8xl font-bold mb-4 drop-shadow-lg">{{ movie.title }}</h1>
-        <div class="flex items-center gap-7">
+        <h1 class="text-8xl font-bold drop-shadow-lg">{{ movie.title }}</h1>
+        <div class="flex items-center gap-7 my-4">
           <p class="flex gap-2 items-center">
             <span
               class="material-symbols-outlined bg-gradient-to-r from-[rgb(255,0,85)] to-[#990033] bg-clip-text text-transparent"
@@ -72,17 +96,95 @@ const movie = computed(() => movieStore.movies.find((m) => m.id === Number(route
             <span class="material-symbols-outlined"> pace </span>{{ runtime }} min
           </p>
         </div>
-      </div>
-    </div>
 
-    <div class="px-20 py-10 text-white">
-      <h1 class="text-3xl font-bold mb-4">{{ movie.title }}</h1>
-      <p class="mb-4">{{ movie.overview }}</p>
-      <div v-if="trailerUrl" class="aspect-video w-full h-[85vh]">
-        <iframe :src="trailerUrl" class="w-full h-full"></iframe>
+        <div class="flex flex-col sm:flex-row gap-5">
+          <button
+            class="bg-[rgb(255,0,85)] py-3 px-10 rounded-lg text-lg sm:text-xl text-white font-medium transition-all duration-300 ease-out hover:scale-105 hover:shadow-lg hover:brightness-110 flex items-center gap-2"
+          >
+            <span class="material-symbols-outlined">play_arrow</span> Ver Trailer
+          </button>
+
+          <button
+            class="border border-[#990033] py-3 px-10 rounded-lg text-lg sm:text-xl text-white font-medium transition-all duration-300 ease-out hover:shadow-md hover:scale-105 hover:brightness-110"
+          >
+            Comprar Ingressos
+          </button>
+        </div>
       </div>
-      <p v-else>Trailer não disponível</p>
-    </div>
+    </section>
+
+    <section class="px-5 lg:px-20 pt-10 pb-20 text-white">
+      <ul class="flex gap-4 p-1 bg-[#1a1a1a] rounded-lg w-fit mb-8">
+        <li
+          v-for="item of menu"
+          :key="item.id"
+          @click="selectMenu(item.id)"
+          :class="[
+            'px-6 py-2 rounded-lg text-lg cursor-pointer transition-colors duration-300',
+            selectedMenuId === item.id ? 'bg-white text-black font-semibold' : 'hover:bg-[#252525]',
+          ]"
+        >
+          {{ item.section }}
+        </li>
+      </ul>
+
+      <div class="content-display min-h-[300px]">
+        <div v-if="selectedMenuId === 1">
+          <h2 class="text-3xl font-bold mb-4">Sinopse</h2>
+          <p class="mb-4 lg:w-[60%]">{{ movie.overview }}</p>
+
+          <h3 class="text-2xl font-semibold mb-3">Diretor</h3>
+          <p class="mb-4">{{ director }}</p>
+
+          <div v-if="trailerUrl" class="aspect-video w-full h-[85vh] mt-6">
+            <h3 class="text-2xl font-semibold mb-3">Trailer Oficial</h3>
+            <iframe :src="trailerUrl" class="w-full h-full rounded-xl" allowfullscreen></iframe>
+          </div>
+          <p v-else class="mt-6">Trailer não disponível</p>
+        </div>
+
+        <div v-else-if="selectedMenuId === 2">
+          <h2 class="text-3xl font-bold mb-4">Horários</h2>
+          <p>{{ scheduleContent }}</p>
+          <p class="mt-4 text-[#990033]">
+            *Lembre-se de substituir o conteúdo reativo `scheduleContent` por dados reais de API de
+            horários de cinema.
+          </p>
+        </div>
+
+        <div v-else-if="selectedMenuId === 3">
+          <h2 class="text-3xl font-bold mb-4">Elenco</h2>
+
+          <ul class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+            <li
+              v-for="actor in castList"
+              :key="actor.name"
+              class="bg-[#1a1a1a] rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300 text-center text-white"
+            >
+              <div class="h-90 w-full overflow-hidden">
+                <img
+                  v-if="actor.profile_path"
+                  :src="`https://image.tmdb.org/t/p/w300${actor.profile_path}`"
+                  :alt="actor.name"
+                  class="h-full w-full object-cover"
+                />
+                <div
+                  v-else
+                  class="w-full h-full flex items-center justify-center bg-gray-700 text-gray-300"
+                >
+                  Sem Foto
+                </div>
+              </div>
+
+              <div class="p-3">
+                <p class="font-semibold text-lg">{{ actor.name }}</p>
+                <p class="text-sm text-gray-400">{{ actor.character }}</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
   </div>
 
   <div v-else>Carregando...</div>
