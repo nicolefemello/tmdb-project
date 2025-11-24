@@ -17,6 +17,7 @@ const user = reactive({
   nameCard: '',
   expiration: '',
   cvv: '',
+  payment: 'credit-card',
 })
 
 const movie = computed(() => {
@@ -65,6 +66,38 @@ function onSubmit() {
             <h2 class="text-3xl font-semibold mb-4">Forma de pagamento</h2>
 
             <div class="grid gap-4">
+              <fieldset class="grid gap-4">
+                <label
+                  class="w-full p-2 rounded-lg bg-[#252525] border border-[#333333] text-white cursor-pointer flex items-center peer-checked:border-[rgb(255,0,85)] has-[:checked]:border-[rgb(255,0,85)]"
+                >
+                  <input
+                    type="radio"
+                    name="payment"
+                    value="credit-card"
+                    v-model="user.payment"
+                    class="peer hidden"
+                  />
+
+                  <span class="material-symbols-outlined ml-5 mr-2">credit_card</span>
+                  Cartão de crédito
+                </label>
+
+                <label
+                  class="w-full p-2 rounded-lg bg-[#252525] border border-[#333333] text-white cursor-pointer flex items-center has-[:checked]:border-[rgb(255,0,85)]"
+                >
+                  <input
+                    type="radio"
+                    name="payment"
+                    value="pix"
+                    v-model="user.payment"
+                    class="peer hidden"
+                  />
+
+                  <span class="material-symbols-outlined ml-5 mr-2">mobile_2</span>
+                  PIX
+                </label>
+              </fieldset>
+
               <GeneralInput
                 id="number-card"
                 label="Número do Cartão"
@@ -85,7 +118,7 @@ function onSubmit() {
           </div>
           <button
             type="submit"
-            class="mt-6 px-6 py-2 bg-gradient-to-r from-[rgb(255,0,85)] to-[#990033] rounded-lg font-semibold transition duration-300 cursor-pointer ml-auto block hover:scale-105"
+            class="w-full py-3 bg-gradient-to-r from-[rgb(255,0,85)] to-[#990033] rounded-lg font-semibold transition duration-300 cursor-pointer ml-auto block hover:scale-105"
           >
             Finalizar Compra
           </button>
@@ -93,7 +126,7 @@ function onSubmit() {
       </div>
     </section>
 
-    <div class="border border-[#333333] rounded-lg px-10 py-5 w-[30%] h-[530px]">
+    <div class="border border-[#333333] rounded-lg px-10 py-5 w-[30%] h-[300px]">
       <h2 class="text-2xl font-semibold mb-5">Resumo do Pedido</h2>
 
       <p class="flex gap-2 items-center text-gray-400 text-lg font-semibold">
@@ -102,30 +135,18 @@ function onSubmit() {
       </p>
 
       <h3 class="mt-5 font-semibold">Assentos:</h3>
-      <!-- <ul class="flex gap-3 my-2">
-        <li v-for="seat in [...selectedSeats]" :key="seat" class="py-1 px-5 rounded-full bg-[#990033]">
+      <ul class="flex gap-3 my-2">
+        <li v-for="seat in movie.seats" :key="seat" class="py-1 px-5 rounded-full bg-[#990033]">
           {{ seat }}
         </li>
       </ul>
 
       <hr class="my-5 border-gray-600" />
 
-      <p class="flex justify-between text-lg font-semibold">
-        <strong class="text-gray-400">Tipo de ingresso:</strong> {{ type }}
-      </p>
-      <p class="flex justify-between text-lg font-semibold">
-        <strong class="text-gray-400">Preço por ingresso:</strong> R$
-        {{ ticketPrice.toFixed(2).replace('.', ',') }}
-      </p>
-      <p class="flex justify-between text-lg font-semibold">
-        <strong class="text-gray-400">Quantidade:</strong> {{ selectedSeats.size }}
-      </p>
-
-      <hr class="my-5 border-gray-600" />
-
       <h3 class="mt-5 flex justify-between text-2xl font-semibold">
-        Total: <span class="text-[rgb(255,0,85)]">R$ {{ totalPrice }}</span>
-      </h3> -->
+        Total:
+        <span class="text-[rgb(255,0,85)]">R$ {{ movie.total.toFixed(2).replace('.', ',') }}</span>
+      </h3>
     </div>
   </div>
 </template>

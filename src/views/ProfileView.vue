@@ -15,7 +15,6 @@ const selectMenu = (id: number) => {
 const menu = [
   { id: 1, section: 'Perfil', icon: 'person' },
   { id: 2, section: 'Histórico', icon: 'local_activity' },
-  { id: 3, section: 'Configurações', icon: 'settings' },
 ]
 
 onMounted(() => {
@@ -115,14 +114,12 @@ function onSubmit() {
             </div>
             <div>
               <p class="text-sm text-[#b5b5b5]">Horário: {{ entry.hour }}</p>
-              <p class="font-semibold">R$ {{ entry.total }}</p>
+              <p class="font-semibold">R$ {{ entry.total.toFixed(2).replace('.', ',') }}</p>
             </div>
           </li>
         </ul>
         <p v-else>Nenhuma compra registrada.</p>
       </div>
-
-      <div v-else-if="selectedMenuId === 3"></div>
     </div>
   </section>
 </template>
