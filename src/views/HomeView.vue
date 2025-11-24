@@ -3,20 +3,20 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { MovieCarroussel } from '@/components'
 import { useMovieStore } from '@/stores/movie'
 
-const store = useMovieStore()
+const movieStore = useMovieStore()
 const currentIndex = ref(0)
 let intervalId: number | undefined
 
 const startCarousel = () => {
   intervalId = setInterval(() => {
-    if (store.movies.length > 0) {
-      currentIndex.value = (currentIndex.value + 1) % store.movies.length
+    if (movieStore.movies.length > 0) {
+      currentIndex.value = (currentIndex.value + 1) % movieStore.movies.length
     }
   }, 4000)
 }
 
 onMounted(async () => {
-  await store.fetchMovies()
+  await movieStore.fetchMovies()
   startCarousel()
 })
 
@@ -32,7 +32,7 @@ onUnmounted(() => {
       :style="{ transform: `translateX(-${currentIndex * 100}%)` }"
     >
       <div
-        v-for="movie in store.movies"
+        v-for="movie in movieStore.movies"
         :key="movie.id"
         class="flex min-w-full flex-col items-center justify-center relative"
       >
@@ -54,18 +54,18 @@ onUnmounted(() => {
   <div class="px-5 py-20 lg:px-20">
     <h2 class="text-3xl font-bold mb-4 text-white px-4">Now Playing</h2>
 
-    <MovieCarroussel :movies="store.movies" />
+    <MovieCarroussel :movies="movieStore.movies" />
   </div>
 
   <div class="px-5 py-20 lg:px-20">
     <h2 class="text-3xl font-bold mb-4 text-white px-4">Now Playing</h2>
 
-    <MovieCarroussel :movies="store.movies" />
+    <MovieCarroussel :movies="movieStore.movies" />
   </div>
 
   <div class="px-5 py-20 lg:px-20">
     <h2 class="text-3xl font-bold mb-4 text-white px-4">Now Playing</h2>
 
-    <MovieCarroussel :movies="store.movies" />
+    <MovieCarroussel :movies="movieStore.movies" />
   </div>
 </template>

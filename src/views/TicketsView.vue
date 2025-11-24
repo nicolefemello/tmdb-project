@@ -1,18 +1,19 @@
 <script setup lang="ts">
 import { onMounted, ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useMovieStore } from '@/stores/movie'
 import { useGenreStore } from '@/stores/genre'
+import { useTicketStore } from '@/stores/ticket'
 
 const router = useRouter()
+const route = useRoute()
 const movieStore = useMovieStore()
 const genreStore = useGenreStore()
+const ticketStore = useTicketStore()
 
 onMounted(async () => {
   await Promise.all([movieStore.fetchMovies(), genreStore.getAllGenres('movie')])
 })
-
-const movie = computed(() => movieStore.movies.find((m) => m.id === Number(route.params.id)))
 
 const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
 const occupiedSeats = new Set(['A5', 'A6', 'B7', 'C3', 'C4', 'D8', 'D9', 'E5', 'E6', 'F7'])
@@ -43,6 +44,18 @@ const getSeatLabel = (index: number) => {
 const type = ref<'IMAX' | '3D' | 'NORMAL'>('3D')
 const ticketPrice = computed(() => (type.value === 'IMAX' ? 45 : type.value === '3D' ? 35 : 25))
 const totalPrice = computed(() => selectedSeats.value.size * ticketPrice.value)
+
+const handlePay = () => {
+  ticketStore.saveSelection(
+    Number(route.params.id),
+    Array.from(selectedSeats.value),
+    type.value,
+    totalPrice.value,
+  )
+
+  ticketStore.confirmPurchase()
+  router.push(`/pagamento/${route.params.id}`)
+}
 </script>
 
 <template>
@@ -136,7 +149,8 @@ const totalPrice = computed(() => selectedSeats.value.size * ticketPrice.value)
       </h3>
       <button
         :disabled="selectedSeats.size === 0"
-        class="w-full mt-10 bg-gradient-to-r from-[rgb(255,0,85)] to-[#990033] py-3 text-xl rounded-lg font-semibold hover:scale-105 transition duration-300"
+        @click="handlePay"
+        class="w-full mt-10 bg-gradient-to-r from-[rgb(255,0,85)] to-[#990033] py-3 text-xl rounded-lg font-semibold hover:scale-105 transition duration-300 cursor-pointer disabled:from-gray-600 disabled:to-gray-600 disabled:cursor-not-allowed"
       >
         Pagar agora
       </button>

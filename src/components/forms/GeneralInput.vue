@@ -19,7 +19,7 @@ const emit = defineEmits(['update:modelValue'])
       :id="id"
       :type="type"
       :value="modelValue"
-      @input="emit('update:modelValue', $event.target.value)"
+      @input="emit('update:modelValue')"
       class="w-full p-2 rounded-lg bg-[#252525] border border-[#333333] text-white"
     />
   </div>

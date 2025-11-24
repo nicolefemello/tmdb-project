@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
-import { Input } from '@/components'
+import { ref, reactive, onMounted, computed } from 'vue'
+import { GeneralInput } from '@/components'
+import { useMovieStore } from '@/stores/movie'
+import { useTicketStore } from '@/stores/ticket'
 
+const movieStore = useMovieStore()
+const ticketStore = useTicketStore()
 const selectedMenuId = ref(2)
 
 const selectMenu = (id: number) => {
@@ -13,6 +17,22 @@ const menu = [
   { id: 2, section: 'Histórico', icon: 'local_activity' },
   { id: 3, section: 'Configurações', icon: 'settings' },
 ]
+
+onMounted(() => {
+  movieStore.fetchMovies()
+})
+
+const history = computed(() =>
+  ticketStore.history.map((item) => {
+    const movie = movieStore.movies.find((m) => m.id === item.movieId)
+
+    return {
+      ...item,
+      movieTitle: movie?.title || 'Filme não encontrado',
+      poster: movie?.poster,
+    }
+  }),
+)
 
 const user = reactive({
   name: '',
@@ -29,25 +49,6 @@ function onSubmit() {
   console.log('Dados enviados:', user)
   alert('Informações atualizadas com sucesso!')
 }
-
-const history = ref([
-  {
-    id: 1,
-    movie: 'Cidade Cyberpunk',
-    date: '11/11/2025',
-    assents: ['B8', 'B9'],
-    hour: '14:30',
-    price: 50,
-  },
-  {
-    id: 2,
-    movie: 'Aventura Espacial',
-    date: '05/10/2025',
-    assents: ['C3', 'C4'],
-    hour: '19:00',
-    price: 70,
-  },
-])
 </script>
 
 <template>
@@ -74,14 +75,14 @@ const history = ref([
 
         <form @submit.prevent="onSubmit">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input id="name" label="Nome Completo" v-model="user.name" />
-            <Input id="email" label="Email" type="email" v-model="user.email" />
-            <Input id="phone" label="Telefone" v-model="user.phone" />
-            <Input id="cpf" label="CPF" v-model="user.cpf" />
-            <Input id="address" label="Endereço" v-model="user.address" />
-            <Input id="city" label="Cidade" v-model="user.city" />
-            <Input id="state" label="Estado" v-model="user.state" />
-            <Input id="zipCode" label="CEP" v-model="user.zipCode" />
+            <GeneralInput id="name" label="Nome Completo" v-model="user.name" />
+            <GeneralInput id="email" label="Email" type="email" v-model="user.email" />
+            <GeneralInput id="phone" label="Telefone" v-model="user.phone" />
+            <GeneralInput id="cpf" label="CPF" v-model="user.cpf" />
+            <GeneralInput id="address" label="Endereço" v-model="user.address" />
+            <GeneralInput id="city" label="Cidade" v-model="user.city" />
+            <GeneralInput id="state" label="Estado" v-model="user.state" />
+            <GeneralInput id="zipCode" label="CEP" v-model="user.zipCode" />
           </div>
 
           <button
@@ -99,27 +100,26 @@ const history = ref([
       >
         <h2 class="text-3xl font-semibold mb-4">Histórico de Compras</h2>
 
-        <ul v-if="history" class="max-h-200 overflow-y-auto">
+        <ul v-if="ticketStore.history.length != 0" class="max-h-200 overflow-y-auto">
           <li
             v-for="entry in history"
             :key="entry.id"
             class="border-b border-[#333333] py-3 px-5 flex justify-between"
           >
             <div>
-              <p class="font-medium">{{ entry.movie }}</p>
-              <p class="text-sm text-[#b5b5b5]">Data: {{ entry.date }}</p>
+              <p class="font-medium">{{ entry.movieTitle }}</p>
               <p class="text-sm text-[#b5b5b5]">
-                Assentos:
-                <span v-for="(assent, index) in entry.assents" :key="index">{{ assent }}</span>
+                Data: {{ new Date(entry.date).toLocaleString() }}
               </p>
+              <p class="text-sm text-[#b5b5b5]">Assentos: {{ entry.seats.join(', ') }}</p>
             </div>
             <div>
               <p class="text-sm text-[#b5b5b5]">Horário: {{ entry.hour }}</p>
-              <p class="font-semibold">R$ {{ entry.price.toFixed(2).replace('.', ',') }}</p>
+              <p class="font-semibold">R$ {{ entry.total }}</p>
             </div>
           </li>
         </ul>
-        <p v-else>Ainda não há histórico de compras.</p>
+        <p v-else>Nenhuma compra registrada.</p>
       </div>
 
       <div v-else-if="selectedMenuId === 3"></div>
