@@ -104,11 +104,12 @@ const scheduleContent = ref('Informações sobre horários de exibição aqui.')
             <span class="material-symbols-outlined">play_arrow</span> Ver Trailer
           </button>
 
-          <button
+          <RouterLink
+            :to="`/tickets/${movie.id}`"
             class="border border-[#990033] py-3 px-10 rounded-lg text-lg sm:text-xl text-white font-medium transition-all duration-300 ease-out hover:shadow-md hover:scale-105 hover:brightness-110"
           >
             Comprar Ingressos
-          </button>
+          </RouterLink>
         </div>
       </div>
     </section>

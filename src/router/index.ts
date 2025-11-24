@@ -5,7 +5,7 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      component: () => import('../layouts/Default.vue'),
+      component: () => import('../layouts/DefaultLayout.vue'),
       children: [
         {
           path: '/',
@@ -36,6 +36,21 @@ const router = createRouter({
           path: '/my-tickets',
           name: 'my-tickets',
           component: () => import('../views/HomeView.vue'),
+        },
+        {
+          path: '/tickets/:id',
+          name: 'tickets',
+          component: () => import('../views/TicketsView.vue'),
+        },
+        {
+          path: '/pagamento/:id',
+          name: 'payment',
+          component: () => import('../views/PaymentView.vue'),
+        },
+        {
+          path: '/profile',
+          name: 'profile',
+          component: () => import('../views/ProfileView.vue'),
         },
       ],
     },
