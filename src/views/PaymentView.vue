@@ -35,6 +35,7 @@ const movie = computed(() => {
 function onSubmit() {
   console.log('Dados enviados:', user)
   alert('Informações atualizadas com sucesso!')
+  router.push(`/pagamento-confirmado/${route.params.id}`)
 }
 </script>
 
@@ -98,22 +99,27 @@ function onSubmit() {
                 </label>
               </fieldset>
 
-              <GeneralInput
-                id="number-card"
-                label="Número do Cartão"
-                type="number"
-                v-model="user.numberCard"
-              />
-              <GeneralInput id="name-card" label="Nome no Cartão" v-model="user.nameCard" />
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div v-if="user.payment === 'credit-card'" class="grid gap-4">
                 <GeneralInput
-                  id="expiration"
-                  label="Validade"
-                  type="date"
-                  v-model="user.expiration"
+                  id="number-card"
+                  label="Número do Cartão"
+                  type="number"
+                  v-model="user.numberCard"
                 />
-                <GeneralInput id="cvv" label="CVV" type="number" v-model="user.cvv" />
+                <GeneralInput id="name-card" label="Nome no Cartão" v-model="user.nameCard" />
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <GeneralInput
+                    id="expiration"
+                    label="Validade"
+                    type="date"
+                    v-model="user.expiration"
+                  />
+                  <GeneralInput id="cvv" label="CVV" type="number" v-model="user.cvv" />
+                </div>
               </div>
+              <p v-else class="text-center text-gray-400">
+                O código PIX será gerado na próxima etapa
+              </p>
             </div>
           </div>
           <button
