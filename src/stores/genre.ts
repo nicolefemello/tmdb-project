@@ -19,7 +19,7 @@ export const useGenreStore = defineStore('genre', () => {
   }
 
   const getAllGenres = async (type) => {
-    const response = await api.get(`genre/${type}/list`)
+    const response = await api.get(`genre/${type}/list?language=pt-BR`)
     state.genres = response.data.genres
   }
 

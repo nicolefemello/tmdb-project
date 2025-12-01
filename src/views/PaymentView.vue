@@ -157,10 +157,10 @@ const copyPixCode = async () => {
   if (!pixCopyCode.value) return
   try {
     await navigator.clipboard.writeText(pixCopyCode.value)
-    alert('Código PIX copiado para a área de transferência!')
+    // alert('Código PIX copiado para a área de transferência!')
   } catch (error) {
     console.error(error)
-    alert('Não foi possível copiar automaticamente. Copie o código manualmente.')
+    // alert('Não foi possível copiar automaticamente. Copie o código manualmente.')
   }
 }
 
@@ -172,7 +172,7 @@ const buildPixPaymentPayload = () => {
   const documentNumber = user.documentNumber
 
   if (!firstName || !documentNumber || !user.email) {
-    alert('Preencha nome, email e CPF para gerar o PIX.')
+    // alert('Preencha nome, email e CPF para gerar o PIX.')
     return null
   }
 
@@ -197,7 +197,7 @@ watch(
     clearPixStatusPolling()
     try {
       ticketStore.confirmPurchase()
-      alert('Pagamento aprovado! Compra confirmada.')
+      // alert('Pagamento aprovado! Compra confirmada.')
       const confirmedId = pixPayment.value?.id ?? latestSelection.value?.movieId ?? 'pix'
       await router.push({ name: 'confirmed-payment', params: { id: confirmedId } })
     } catch (error) {
@@ -237,10 +237,10 @@ async function onSubmit() {
 
     ticketStore.resetPixPayment()
     await ticketStore.requestPixPayment(pixPayload)
-    alert('PIX gerado! Utilize o código ao lado para concluir o pagamento no seu banco.')
+    // alert('PIX gerado! Utilize o código ao lado para concluir o pagamento no seu banco.')
   } catch (error) {
     console.error(error)
-    alert('Não foi possível gerar o PIX. Verifique os dados e tente novamente.')
+    // alert('Não foi possível gerar o PIX. Verifique os dados e tente novamente.')
   }
 }
 </script>

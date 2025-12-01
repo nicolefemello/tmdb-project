@@ -53,7 +53,6 @@ const movie = computed(() => movieStore.movies.find((m) => m.id === Number(route
 
 const router = useRouter()
 
-// default fictitious showtimes
 const defaultTimes = ['12:00', '15:30', '18:00', '21:15']
 
 const getNextDays = (days = 7) => {
