@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useMovieStore } from '@/stores/movie'
 import { useGenreStore } from '@/stores/genre'
 import api from '@/plugins/axios'
@@ -25,7 +25,7 @@ onMounted(async () => {
   const movieId = Number(route.params.id)
 
   try {
-    const videosResponse = await api.get(`/movie/${movieId}/videos?language=en-US`)
+    const videosResponse = await api.get(`/movie/${movieId}/videos?language=pt-BR`)
     const trailer = videosResponse.data.results.find(
       (v: any) => v.type === 'Trailer' && v.site === 'YouTube',
     )
@@ -33,10 +33,10 @@ onMounted(async () => {
       trailerUrl.value = `https://www.youtube.com/embed/${trailer.key}`
     }
 
-    const detailsResponse = await api.get(`/movie/${movieId}?language=en-US`)
+    const detailsResponse = await api.get(`/movie/${movieId}?language=pt-BR`)
     runtime.value = detailsResponse.data.runtime
 
-    const creditsResponse = await api.get(`/movie/${movieId}/credits?language=en-US`)
+    const creditsResponse = await api.get(`/movie/${movieId}/credits?language=pt-BR`)
     const movieDirector = creditsResponse.data.crew.find((member: any) => member.job === 'Director')
     director.value = movieDirector ? movieDirector.name : 'Desconhecido'
     castList.value = creditsResponse.data.cast.map((actor: any) => ({
@@ -51,46 +51,62 @@ onMounted(async () => {
 
 const movie = computed(() => movieStore.movies.find((m) => m.id === Number(route.params.id)))
 
+const router = useRouter()
+
+// default fictitious showtimes
+const defaultTimes = ['12:00', '15:30', '18:00', '21:15']
+
+const getNextDays = (days = 7) => {
+  const result: { label: string; iso: string; times: string[] }[] = []
+  for (let i = 0; i < days; i++) {
+    const d = new Date()
+    d.setDate(d.getDate() + i)
+    const iso = d.toISOString().split('T')[0] ?? ''
+    const label = d.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' }) as string
+    result.push({ label: label ?? '', iso, times: defaultTimes })
+  }
+  return result
+}
+
+const scheduleDays = ref(getNextDays(7))
+
+const selectShowtime = (time: string) => {
+  if (!movie.value) return
+  router.push({ path: `/tickets/${movie.value.id}`, query: { time } })
+}
+
 const menu = [
   { id: 1, section: 'Visão Geral' },
   { id: 2, section: 'Horários' },
   { id: 3, section: 'Elenco' },
 ]
 
-const scheduleContent = ref('Informações sobre horários de exibição aqui.')
 </script>
 
 <template>
   <div v-if="movie">
     <section class="relative h-[80vh] overflow-hidden">
-      <img
-        :src="`https://image.tmdb.org/t/p/original${movie.backdrop_path}`"
-        :alt="movie.title"
-        class="absolute w-full h-full object-cover"
-      />
+      <img :src="`https://image.tmdb.org/t/p/original${movie.backdrop_path}`" :alt="movie.title"
+        class="absolute w-full h-full object-cover" />
       <div class="absolute w-full h-full bg-gradient-to-b from-transparent to-[#252525]"></div>
 
       <div class="absolute left-10 bottom-30 z-10 text-white px-4">
-        <span
-          v-for="genre_id in movie.genre_ids"
-          :key="genre_id"
-          class="bg-gradient-to-r from-[rgb(255,0,85)] to-[#990033] text-white text-sm font-semibold px-4 py-2 mr-3 rounded-lg"
-        >
+        <span v-for="genre_id in movie.genre_ids" :key="genre_id"
+          class="bg-gradient-to-r from-[rgb(255,0,85)] to-[#990033] text-white text-sm font-semibold px-4 py-2 mr-3 rounded-lg">
           {{ genreStore.getGenreName(genre_id) }}
         </span>
         <h1 class="text-8xl font-bold drop-shadow-lg">{{ movie.title }}</h1>
         <div class="flex items-center gap-7 my-4">
           <p class="flex gap-2 items-center">
             <span
-              class="material-symbols-outlined bg-gradient-to-r from-[rgb(255,0,85)] to-[#990033] bg-clip-text text-transparent"
-            >
+              class="material-symbols-outlined bg-gradient-to-r from-[rgb(255,0,85)] to-[#990033] bg-clip-text text-transparent">
               kid_star
             </span>
             {{ movie.vote_average.toFixed(2) }}
           </p>
           <p class="flex gap-2 items-center text-[#b5b5b5]">
-            <span class="material-symbols-outlined"> calendar_today </span
-            >{{ new Date(movie.release_date).getFullYear() }}
+            <span class="material-symbols-outlined"> calendar_today </span>{{ new Date(movie.release_date).getFullYear()
+            }}
           </p>
           <p class="flex gap-2 items-center text-[#b5b5b5]">
             <span class="material-symbols-outlined"> pace </span>{{ runtime }} min
@@ -99,15 +115,12 @@ const scheduleContent = ref('Informações sobre horários de exibição aqui.')
 
         <div class="flex flex-col sm:flex-row gap-5">
           <button
-            class="bg-[rgb(255,0,85)] py-3 px-10 rounded-lg text-lg sm:text-xl text-white font-medium transition-all duration-300 ease-out hover:scale-105 hover:shadow-lg hover:brightness-110 flex items-center gap-2"
-          >
+            class="bg-[rgb(255,0,85)] py-3 px-10 rounded-lg text-lg sm:text-xl text-white font-medium transition-all duration-300 ease-out hover:scale-105 hover:shadow-lg hover:brightness-110 flex items-center gap-2">
             <span class="material-symbols-outlined">play_arrow</span> Ver Trailer
           </button>
 
-          <RouterLink
-            :to="`/tickets/${movie.id}`"
-            class="border border-[#990033] py-3 px-10 rounded-lg text-lg sm:text-xl text-white font-medium transition-all duration-300 ease-out hover:shadow-md hover:scale-105 hover:brightness-110"
-          >
+          <RouterLink :to="`/tickets/${movie.id}`"
+            class="border border-[#990033] py-3 px-10 rounded-lg text-lg sm:text-xl text-white font-medium transition-all duration-300 ease-out hover:shadow-md hover:scale-105 hover:brightness-110">
             Comprar Ingressos
           </RouterLink>
         </div>
@@ -116,15 +129,10 @@ const scheduleContent = ref('Informações sobre horários de exibição aqui.')
 
     <section class="px-5 lg:px-20 pt-10 pb-20 text-white">
       <ul class="flex gap-4 p-1 bg-[#1a1a1a] rounded-lg w-fit mb-8">
-        <li
-          v-for="item of menu"
-          :key="item.id"
-          @click="selectMenu(item.id)"
-          :class="[
-            'px-6 py-2 rounded-lg text-lg cursor-pointer transition-colors duration-300',
-            selectedMenuId === item.id ? 'bg-white text-black font-semibold' : 'hover:bg-[#252525]',
-          ]"
-        >
+        <li v-for="item of menu" :key="item.id" @click="selectMenu(item.id)" :class="[
+          'px-6 py-2 rounded-lg text-lg cursor-pointer transition-colors duration-300',
+          selectedMenuId === item.id ? 'bg-white text-black font-semibold' : 'hover:bg-[#252525]',
+        ]">
           {{ item.section }}
         </li>
       </ul>
@@ -146,10 +154,27 @@ const scheduleContent = ref('Informações sobre horários de exibição aqui.')
 
         <div v-else-if="selectedMenuId === 2">
           <h2 class="text-3xl font-bold mb-4">Horários</h2>
-          <p>{{ scheduleContent }}</p>
+
+          <div class="grid gap-6">
+            <div v-for="day in scheduleDays" :key="day.iso" class="bg-[#0f0f0f] p-4 rounded-lg">
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <p class="font-semibold">{{ day.label }}</p>
+                  <p class="text-sm text-gray-400">Data: {{ day.iso }}</p>
+                </div>
+                <div class="flex gap-3">
+                  <button v-for="time in day.times" :key="time" @click="selectShowtime(time)"
+                    class="px-4 py-2 bg-[#252525] rounded-md hover:bg-[rgb(255,0,85)] hover:text-white transition">
+                    {{ time }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <p class="mt-4 text-[#990033]">
-            *Lembre-se de substituir o conteúdo reativo `scheduleContent` por dados reais de API de
-            horários de cinema.
+            *Horários fictícios padrão. Clique em um horário para prosseguir para a compra (será direcionado à
+            página de seleção de assentos).
           </p>
         </div>
 
@@ -157,24 +182,16 @@ const scheduleContent = ref('Informações sobre horários de exibição aqui.')
           <h2 class="text-3xl font-bold mb-4">Elenco</h2>
 
           <ul class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-            <li
-              v-for="actor in castList"
-              :key="actor.name"
-              class="bg-[#1a1a1a] rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300 text-center text-white"
-            >
+            <li v-for="actor in castList" :key="actor.name"
+              class="bg-[#1a1a1a] rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300 text-center text-white">
               <div class="h-90 w-full overflow-hidden">
-                <img
-                  v-if="actor.profile_path"
-                  :src="`https://image.tmdb.org/t/p/w300${actor.profile_path}`"
-                  :alt="actor.name"
-                  class="h-full w-full object-cover"
-                />
-                <div
-                  v-else
-                  class="w-full h-full flex items-center justify-center bg-gray-700 text-gray-300"
-                >
-                  Sem Foto
-                </div>
+                <a :href="`https://www.google.com/search?q=${actor.name}`" target="_blank" rel="noopener noreferrer">
+                  <img v-if="actor.profile_path" :src="`https://image.tmdb.org/t/p/w300${actor.profile_path}`"
+                    :alt="actor.name" class="h-full w-full object-cover" />
+                  <div v-else class="w-full h-full flex items-center justify-center bg-gray-700 text-gray-300">
+                    Sem Foto
+                  </div>
+                </a>
               </div>
 
               <div class="p-3">

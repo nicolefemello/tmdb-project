@@ -15,12 +15,8 @@ const emit = defineEmits(['update:modelValue'])
       {{ label }}
     </label>
 
-    <input
-      :id="id"
-      :type="type"
-      :value="modelValue"
-      @input="emit('update:modelValue')"
-      class="w-full p-2 rounded-lg bg-[#252525] border border-[#333333] text-white"
-    />
+    <input :id="id" :type="type" :value="modelValue"
+      @input="(event) => emit('update:modelValue', (event.target as HTMLInputElement).value)"
+      class="w-full p-2 rounded-lg bg-[#252525] border border-[#333333] text-white" />
   </div>
 </template>
