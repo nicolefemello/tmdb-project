@@ -10,7 +10,11 @@ const ticketStore = useTicketStore()
 const movieStore = useMovieStore()
 
 const formatCurrency = (value: number) =>
-  new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2 }).format(value)
+  new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+    minimumFractionDigits: 2,
+  }).format(value)
 
 const purchaseSnapshot = computed(() => {
   if (ticketStore.state.lastConfirmedPurchase) {
@@ -59,9 +63,15 @@ const backdropStyle = computed(() => {
   }
 })
 
-const formattedTotal = computed(() => (selection.value ? formatCurrency(selection.value.totalPrice) : '—'))
-const pixAmount = computed(() => purchaseSnapshot.value?.pixAmount ?? selection.value?.totalPrice ?? null)
-const pixAmountLabel = computed(() => (pixAmount.value !== null ? formatCurrency(pixAmount.value) : formattedTotal.value))
+const formattedTotal = computed(() =>
+  selection.value ? formatCurrency(selection.value.totalPrice) : '—',
+)
+const pixAmount = computed(
+  () => purchaseSnapshot.value?.pixAmount ?? selection.value?.totalPrice ?? null,
+)
+const pixAmountLabel = computed(() =>
+  pixAmount.value !== null ? formatCurrency(pixAmount.value) : formattedTotal.value,
+)
 
 const paymentStatusMap: Record<string, string> = {
   approved: 'Pagamento aprovado',
@@ -131,7 +141,8 @@ const reminders = [
     <div class="mx-auto flex max-w-6xl flex-col gap-6">
       <div class="flex flex-col gap-2 text-center">
         <div
-          class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[rgb(255,0,85)]/20 text-[rgb(255,0,85)]">
+          class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[rgb(255,0,85)]/20 text-[rgb(255,0,85)]"
+        >
           <span class="material-symbols-outlined text-4xl">check_circle</span>
         </div>
         <p class="text-sm uppercase tracking-[0.4em] text-gray-400">Pagamento confirmado</p>
@@ -142,23 +153,32 @@ const reminders = [
       <div v-if="hasPurchase" class="grid gap-6 lg:grid-cols-[2fr_1fr]">
         <article
           class="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] p-8 shadow-2xl"
-          :style="backdropStyle">
+          :style="backdropStyle"
+        >
           <div class="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-center">
-            <div v-if="posterUrl"
-              class="h-[220px] w-full overflow-hidden rounded-2xl border border-white/20 shadow-lg lg:w-[200px]">
+            <div
+              v-if="posterUrl"
+              class="h-[220px] w-full overflow-hidden rounded-2xl border border-white/20 shadow-lg lg:w-[200px]"
+            >
               <img :src="posterUrl" :alt="movieTitle" class="h-full w-full object-cover" />
             </div>
             <div class="flex flex-1 flex-col gap-3">
               <p class="text-sm uppercase tracking-widest text-gray-300">Ingressos confirmados</p>
               <h2 class="text-3xl font-semibold">{{ movieTitle }}</h2>
               <div class="flex flex-wrap items-center gap-3 text-sm text-gray-300">
-                <span class="rounded-full border border-white/20 px-4 py-1">{{ quantityLabel }}</span>
-                <span class="rounded-full border border-white/20 px-4 py-1">Assentos: {{ seatList.join(', ') }}</span>
+                <span class="rounded-full border border-white/20 px-4 py-1">{{
+                  quantityLabel
+                }}</span>
+                <span class="rounded-full border border-white/20 px-4 py-1"
+                  >Assentos: {{ seatList.join(', ') }}</span
+                >
               </div>
               <div class="mt-4 grid gap-2 text-gray-200 md:grid-cols-2">
                 <p>
                   <span class="text-sm text-gray-400">Valor pago</span><br />
-                  <span class="text-2xl font-semibold text-[rgb(255,0,85)]">{{ pixAmountLabel }}</span>
+                  <span class="text-2xl font-semibold text-[rgb(255,0,85)]">{{
+                    pixAmountLabel
+                  }}</span>
                 </p>
                 <p>
                   <span class="text-sm text-gray-400">Status</span><br />
@@ -216,7 +236,10 @@ const reminders = [
         </aside>
       </div>
 
-      <div v-else class="mx-auto max-w-3xl rounded-2xl border border-white/10 bg-[#121212] p-10 text-center">
+      <div
+        v-else
+        class="mx-auto max-w-3xl rounded-2xl border border-white/10 bg-[#121212] p-10 text-center"
+      >
         <p class="text-lg font-semibold">Nenhuma compra recente encontrada</p>
         <p class="mt-2 text-gray-400">
           Gere um novo pagamento PIX e finalize a compra para visualizar os detalhes por aqui.
@@ -224,12 +247,14 @@ const reminders = [
         <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
           <button
             class="rounded-full border border-white/20 px-6 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
-            @click="goToMovies">
+            @click="goToMovies"
+          >
             Ver filmes
           </button>
           <button
             class="rounded-full bg-[rgb(255,0,85)] px-6 py-2 text-sm font-semibold text-white transition hover:brightness-110"
-            @click="goToHome">
+            @click="goToHome"
+          >
             Voltar para Home
           </button>
         </div>
@@ -243,12 +268,16 @@ const reminders = [
         <div class="mt-6 flex flex-wrap gap-3">
           <button
             class="rounded-full border border-white/20 px-6 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
-            @click="goToTickets" :disabled="!hasPurchase" :class="{ 'opacity-60 cursor-not-allowed': !hasPurchase }">
+            @click="goToTickets"
+            :disabled="!hasPurchase"
+            :class="{ 'opacity-60 cursor-not-allowed': !hasPurchase }"
+          >
             Ver meus ingressos
           </button>
           <button
             class="rounded-full bg-[rgb(255,0,85)] px-6 py-2 text-sm font-semibold text-white transition hover:brightness-110"
-            @click="goToHome">
+            @click="goToHome"
+          >
             Voltar para Home
           </button>
         </div>
