@@ -1,7 +1,6 @@
 export interface IMenu {
-  name: string
   link?: string
-  icon?: string
+  icon: string
 }
 
 export interface IBaseState {
