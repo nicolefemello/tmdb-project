@@ -43,11 +43,17 @@ const getSeatLabel = (index: number) => {
 }
 
 const type = ref<'IMAX' | '3D' | 'NORMAL'>('3D')
-const ticketPrice = computed(() => (type.value === 'IMAX' ? 0.01 : type.value === '3D' ? 0.01 : 0.01))
+const ticketPrice = computed(() =>
+  type.value === 'IMAX' ? 0.01 : type.value === '3D' ? 0.01 : 0.01,
+)
 const totalPrice = computed(() => selectedSeats.value.size * ticketPrice.value)
 
 const handlePay = () => {
-  ticketStore.saveSelection(Number(route.params.id), Array.from(selectedSeats.value), totalPrice.value)
+  ticketStore.saveSelection(
+    Number(route.params.id),
+    Array.from(selectedSeats.value),
+    totalPrice.value,
+  )
 
   ticketStore.confirmPurchase()
   router.push(`/pagamento/${route.params.id}`)
@@ -58,29 +64,41 @@ const handlePay = () => {
   <div class="flex gap-10 px-5 lg:px-20 pt-10 pb-20 text-white">
     <section class="px-20 w-[70%]">
       <button class="flex gap-2 items-center group cursor-pointer" @click="router.back()">
-        <span
-          class="material-symbols-outlined group-hover:-translate-x-1 transition duration-300">arrow_back</span>Voltar
+        <span class="material-symbols-outlined group-hover:-translate-x-1 transition duration-300"
+          >arrow_back</span
+        >Voltar
       </button>
       <h1 class="text-4xl font-semibold my-5">Selecione seus assentos</h1>
 
-      <div class="h-2 bg-gradient-to-r from-transparent via-[#990033] to-transparent w-full mt-10"></div>
+      <div
+        class="h-2 bg-gradient-to-r from-transparent via-[#990033] to-transparent w-full mt-10"
+      ></div>
       <p class="text-center">TELA</p>
-      <p v-if="selectedTime" class="text-center text-[#990033] mt-2">Sessão selecionada: {{ selectedTime }}</p>
+      <p v-if="selectedTime" class="text-center text-[#990033] mt-2">
+        Sessão selecionada: {{ selectedTime }}
+      </p>
 
-      <div class="border border-[#333333] rounded-lg px-10 py-5 mt-5 flex items-center justify-between">
+      <div
+        class="border border-[#333333] rounded-lg px-10 py-5 mt-5 flex items-center justify-between"
+      >
         <ul class="grid gap-2 my-5">
           <li v-for="(row, index) in rows" :key="index" class="py-5">{{ row }}</li>
         </ul>
 
         <div class="grid grid-cols-12 gap-2 my-5 w-full mx-5">
-          <div v-for="seat in 96" :key="seat" @click="toggleSeat(getSeatLabel(seat))" :class="[
-            'text-center pt-3 pb-1 rounded-t-lg cursor-pointer transition duration-200',
-            getSeatStatus(getSeatLabel(seat)) === 'occupied'
-              ? 'bg-gray-500 cursor-not-allowed'
-              : getSeatStatus(getSeatLabel(seat)) === 'selected'
-                ? 'bg-[#990033]'
-                : 'bg-gray-700 hover:bg-[rgb(255,0,85)]',
-          ]">
+          <div
+            v-for="seat in 96"
+            :key="seat"
+            @click="toggleSeat(getSeatLabel(seat))"
+            :class="[
+              'text-center pt-3 pb-1 rounded-t-lg cursor-pointer transition duration-200',
+              getSeatStatus(getSeatLabel(seat)) === 'occupied'
+                ? 'bg-gray-500 cursor-not-allowed'
+                : getSeatStatus(getSeatLabel(seat)) === 'selected'
+                  ? 'bg-[#990033]'
+                  : 'bg-gray-700 hover:bg-[rgb(255,0,85)]',
+            ]"
+          >
             <span class="material-symbols-outlined">chair</span>
             <p class="text-xs">{{ getSeatLabel(seat) }}</p>
           </div>
@@ -107,7 +125,11 @@ const handlePay = () => {
       <h3 class="mt-5 font-semibold">Assentos:</h3>
       <p v-if="selectedSeats.size === 0">Nenhum assento selecionado</p>
       <ul class="flex gap-3 my-2">
-        <li v-for="seat in [...selectedSeats]" :key="seat" class="py-1 px-5 rounded-full bg-[#990033]">
+        <li
+          v-for="seat in [...selectedSeats]"
+          :key="seat"
+          class="py-1 px-5 rounded-full bg-[#990033]"
+        >
           {{ seat }}
         </li>
       </ul>
@@ -130,8 +152,11 @@ const handlePay = () => {
       <h3 class="mt-5 flex justify-between text-2xl font-semibold">
         Total: <span class="text-[rgb(255,0,85)]">R$ {{ totalPrice }}</span>
       </h3>
-      <button :disabled="selectedSeats.size === 0" @click="handlePay"
-        class="w-full mt-10 bg-gradient-to-r from-[rgb(255,0,85)] to-[#990033] py-3 text-xl rounded-lg font-semibold hover:scale-105 transition duration-300 cursor-pointer disabled:from-gray-600 disabled:to-gray-600 disabled:cursor-not-allowed">
+      <button
+        :disabled="selectedSeats.size === 0"
+        @click="handlePay"
+        class="w-full mt-10 bg-gradient-to-r from-[rgb(255,0,85)] to-[#990033] py-3 text-xl rounded-lg font-semibold hover:scale-105 transition duration-300 cursor-pointer disabled:from-gray-600 disabled:to-gray-600 disabled:cursor-not-allowed"
+      >
         Pagar agora
       </button>
     </div>

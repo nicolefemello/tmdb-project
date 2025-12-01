@@ -36,14 +36,19 @@ const purchaseSummary = computed(() => {
 
   return {
     ...selection,
-    totalPrice: typeof selection.totalPrice === 'number' ? selection.totalPrice : Number(selection.totalPrice) || 0,
+    totalPrice:
+      typeof selection.totalPrice === 'number'
+        ? selection.totalPrice
+        : Number(selection.totalPrice) || 0,
     movieTitle: movieData?.title || 'Filme não encontrado',
     poster: movieData?.poster_path || '',
   }
 })
 
 const pixPayment = computed(() => ticketStore.state.pixPayment)
-const pixTransactionData = computed(() => pixPayment.value?.point_of_interaction?.transaction_data ?? null)
+const pixTransactionData = computed(
+  () => pixPayment.value?.point_of_interaction?.transaction_data ?? null,
+)
 const pixCurrency = computed(() => pixPayment.value?.currency_id ?? 'BRL')
 const pixAmountValue = computed(() => {
   const payment = pixPayment.value
@@ -100,11 +105,15 @@ const pixReceiverName = computed(
   () => pixTransactionData.value?.bank_info?.collector?.account_holder_name ?? null,
 )
 const pixStatusLabel = computed(() => pixPayment.value?.status ?? 'pending')
-const pixStatusDetail = computed(() => pixPayment.value?.status_detail ?? 'pending_waiting_transfer')
+const pixStatusDetail = computed(
+  () => pixPayment.value?.status_detail ?? 'pending_waiting_transfer',
+)
 const pixReference = computed(() => pixPayment.value?.external_reference ?? '—')
 const pixDescription = computed(() => {
   if (pixPayment.value?.description) return pixPayment.value.description
-  return purchaseSummary.value ? `Ingressos para ${purchaseSummary.value.movieTitle}` : 'Pagamento PIX'
+  return purchaseSummary.value
+    ? `Ingressos para ${purchaseSummary.value.movieTitle}`
+    : 'Pagamento PIX'
 })
 const pixHasPayment = computed(() => Boolean(pixPayment.value))
 const pixPaid = computed(() => {
@@ -249,8 +258,9 @@ async function onSubmit() {
   <div class="flex gap-10 px-5 lg:px-20 pt-10 pb-20 text-white">
     <section class="px-20 w-[70%]">
       <button class="flex gap-2 items-center group cursor-pointer" @click="router.back()">
-        <span
-          class="material-symbols-outlined group-hover:-translate-x-1 transition duration-300">arrow_back</span>Voltar
+        <span class="material-symbols-outlined group-hover:-translate-x-1 transition duration-300"
+          >arrow_back</span
+        >Voltar
       </button>
       <h1 class="text-4xl font-semibold my-5">Finalizar compra</h1>
 
@@ -277,11 +287,15 @@ async function onSubmit() {
 
             <div class="grid gap-4">
               <p class="text-gray-300">
-                Escaneie o QR Code do seu app bancário ou copie o código PIX abaixo. O código expira em
-                <strong>{{ pixExpiration }}</strong>.
+                Escaneie o QR Code do seu app bancário ou copie o código PIX abaixo. O código expira
+                em
+                <strong>{{ pixExpiration }}</strong
+                >.
               </p>
 
-              <div class="bg-[#0d0d0d] border border-dashed border-[#555] rounded-lg p-4 flex flex-col gap-3">
+              <div
+                class="bg-[#0d0d0d] border border-dashed border-[#555] rounded-lg p-4 flex flex-col gap-3"
+              >
                 <div v-if="pixIsLoading" class="text-center text-gray-400">Gerando PIX...</div>
                 <template v-else>
                   <div v-if="!pixHasPayment" class="text-center text-gray-400 text-sm py-10">
@@ -289,34 +303,51 @@ async function onSubmit() {
                   </div>
                   <template v-else>
                     <div class="space-y-6">
-
-
                       <div>
                         <p class="text-xs uppercase tracking-wide text-gray-500">QR Code</p>
                         <div
-                          class="mt-2 flex items-center justify-center border border-[#333] rounded-md bg-white/90 p-4 h-52">
-                          <img v-if="pixQrImage" :src="pixQrImage" alt="QR Code PIX"
-                            class="w-full max-w-[200px] object-contain" />
+                          class="mt-2 flex items-center justify-center border border-[#333] rounded-md bg-white/90 p-4 h-52"
+                        >
+                          <img
+                            v-if="pixQrImage"
+                            :src="pixQrImage"
+                            alt="QR Code PIX"
+                            class="w-full max-w-[200px] object-contain"
+                          />
                           <span v-else class="text-xs text-gray-500">Imagem não disponível</span>
                         </div>
                       </div>
 
                       <div class="flex flex-col gap-3">
-                        <label class="text-xs uppercase tracking-wide text-gray-500">Código copiar/colar</label>
-                        <textarea readonly
+                        <label class="text-xs uppercase tracking-wide text-gray-500"
+                          >Código copiar/colar</label
+                        >
+                        <textarea
+                          readonly
                           class="bg-transparent border border-[#333333] rounded-md p-3 text-sm text-gray-100 resize-none h-24"
-                          :value="pixCopyCode || 'Gere o PIX para copiar o código completo'"></textarea>
-                        <button type="button"
+                          :value="pixCopyCode || 'Gere o PIX para copiar o código completo'"
+                        ></textarea>
+                        <button
+                          type="button"
                           class="w-full py-2 bg-[#990033] rounded-md font-semibold hover:scale-105 transition disabled:bg-gray-600 disabled:cursor-not-allowed"
-                          @click="copyPixCode" :disabled="!pixCopyCode">
+                          @click="copyPixCode"
+                          :disabled="!pixCopyCode"
+                        >
                           Copiar código completo
                         </button>
                       </div>
-                      <div class="bg-black/40 border border-[#333] rounded-lg p-4 flex flex-col gap-3">
+                      <div
+                        class="bg-black/40 border border-[#333] rounded-lg p-4 flex flex-col gap-3"
+                      >
                         <div class="flex items-center justify-between">
                           <p class="text-xs uppercase tracking-wide text-gray-500">Comprovante</p>
-                          <a v-if="pixTicketUrl" :href="pixTicketUrl" target="_blank" rel="noopener"
-                            class="text-xs text-[#ff0055] underline">
+                          <a
+                            v-if="pixTicketUrl"
+                            :href="pixTicketUrl"
+                            target="_blank"
+                            rel="noopener"
+                            class="text-xs text-[#ff0055] underline"
+                          >
                             Ver comprovante
                           </a>
                         </div>
@@ -348,13 +379,15 @@ async function onSubmit() {
               <p v-if="pixError" class="text-sm text-red-400">{{ pixError }}</p>
 
               <p class="text-sm text-gray-400">
-                Depois de gerar o PIX, conclua o pagamento no aplicativo do seu banco e retorne a esta página para
-                acompanhar a confirmação.
+                Depois de gerar o PIX, conclua o pagamento no aplicativo do seu banco e retorne a
+                esta página para acompanhar a confirmação.
               </p>
             </div>
           </div>
-          <button type="submit"
-            class="w-full py-3 bg-gradient-to-r from-[rgb(255,0,85)] to-[#990033] rounded-lg font-semibold transition duration-300 cursor-pointer ml-auto block hover:scale-105">
+          <button
+            type="submit"
+            class="w-full py-3 bg-gradient-to-r from-[rgb(255,0,85)] to-[#990033] rounded-lg font-semibold transition duration-300 cursor-pointer ml-auto block hover:scale-105"
+          >
             Gerar PIX
           </button>
         </form>
@@ -367,17 +400,21 @@ async function onSubmit() {
       <p class="flex gap-2 items-center text-gray-400 text-lg font-semibold">
         <span class="material-symbols-outlined">group</span>
         <template v-if="purchaseSummary">
-          {{ `${purchaseSummary.seats.length} ${purchaseSummary.seats.length === 1 ? 'ingresso' : 'ingressos'}` }}
+          {{
+            `${purchaseSummary.seats.length} ${purchaseSummary.seats.length === 1 ? 'ingresso' : 'ingressos'}`
+          }}
         </template>
-        <template v-else>
-          Nenhum assento selecionado
-        </template>
+        <template v-else> Nenhum assento selecionado </template>
       </p>
 
       <h3 class="mt-5 font-semibold">Assentos:</h3>
       <p v-if="!purchaseSummary" class="text-gray-500">Nenhum assento selecionado</p>
       <ul v-else class="flex gap-3 my-2">
-        <li v-for="seat in purchaseSummary.seats" :key="seat" class="py-1 px-5 rounded-full bg-[#990033]">
+        <li
+          v-for="seat in purchaseSummary.seats"
+          :key="seat"
+          class="py-1 px-5 rounded-full bg-[#990033]"
+        >
           {{ seat }}
         </li>
       </ul>
