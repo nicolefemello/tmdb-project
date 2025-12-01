@@ -30,28 +30,36 @@ const scrollByCards = (direction: 'prev' | 'next') => {
 
 <template>
   <div class="relative">
-    <div v-if="hasMovies" class="relative overflow-hidden rounded-3xl border border-white/10 bg-black/30 px-6 py-10">
-      <button type="button" class="carousel-button left" aria-label="Filmes anteriores" @click="scrollByCards('prev')">
+    <div v-if="hasMovies" class="relative overflow-x-hidden rounded-3xl">
+      <button type="button" class="carousel-button left" @click="scrollByCards('prev')">
         <span class="material-symbols-outlined">chevron_left</span>
       </button>
-      <button type="button" class="carousel-button right" aria-label="Próximos filmes" @click="scrollByCards('next')">
+      <button type="button" class="carousel-button right" @click="scrollByCards('next')">
         <span class="material-symbols-outlined">chevron_right</span>
       </button>
 
-      <span class="fade-edge left"></span>
-      <span class="fade-edge right"></span>
+      <span class="fade-edge left cursor-pointer"></span>
+      <span class="fade-edge right cursor-pointer"></span>
 
       <ul ref="scrollerRef" class="movie-scroll flex gap-6 overflow-x-auto scroll-smooth pb-6">
-        <li v-for="movie in props.movies" :key="movie.id"
-          class="group relative min-w-[280px] max-w-[280px] overflow-hidden rounded-[32px] border border-white/10 bg-white/5 shadow-2xl transition duration-500 hover:-translate-y-2 hover:border-[rgb(255,0,85)]/60 lg:min-w-[360px] lg:max-w-[360px]">
+        <li
+          v-for="movie in props.movies"
+          :key="movie.id"
+          class="group relative min-w-[280px] max-w-[280px] overflow-hidden rounded-lg border border-white/10 bg-white/5 shadow-2xl transition duration-500 hover:border-[rgb(255,0,85)]/60 lg:min-w-[360px] lg:max-w-[360px]"
+        >
           <RouterLink :to="`/movies/details/${movie.id}`" class="block">
             <div class="relative aspect-[2/3] w-full overflow-hidden">
-              <img :src="getPosterUrl(movie)" :alt="movie.title"
-                class="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+              <img
+                :src="getPosterUrl(movie)"
+                :alt="movie.title"
+                class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+              />
               <span
-                class="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/70 opacity-0 transition duration-500 group-hover:opacity-100"></span>
+                class="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black transition duration-500 group-hover:opacity-70"
+              ></span>
               <div
-                class="absolute inset-x-0 bottom-0 flex translate-y-6 flex-col gap-2 px-6 pb-6 text-white transition duration-500 group-hover:translate-y-0">
+                class="absolute inset-x-0 bottom-5 flex translate-y-6 flex-col gap-2 px-6 pb-6 text-white transition duration-500 group-hover:translate-y-0"
+              >
                 <p class="text-xs uppercase tracking-[0.5em] text-gray-300">Em cartaz</p>
                 <h3 class="text-2xl font-semibold leading-tight drop-shadow">{{ movie.title }}</h3>
                 <div class="flex items-center gap-2 text-sm text-gray-200">
@@ -66,8 +74,15 @@ const scrollByCards = (direction: 'prev' | 'next') => {
       </ul>
     </div>
 
-    <div v-else class="grid gap-4 rounded-3xl border border-white/5 bg-black/40 p-6 text-white lg:grid-cols-4">
-      <article v-for="index in 4" :key="index" class="animate-pulse rounded-2xl border border-white/10 bg-white/5 p-4">
+    <div
+      v-else
+      class="grid gap-4 rounded-3xl border border-white/5 bg-black/40 p-6 text-white lg:grid-cols-4"
+    >
+      <article
+        v-for="index in 4"
+        :key="index"
+        class="animate-pulse rounded-2xl border border-white/10 bg-white/5 p-4"
+      >
         <div class="h-44 rounded-xl bg-white/10"></div>
         <div class="mt-4 h-5 w-3/4 rounded-full bg-white/20"></div>
         <div class="mt-2 h-3 w-1/2 rounded-full bg-white/10"></div>
@@ -112,7 +127,10 @@ const scrollByCards = (direction: 'prev' | 'next') => {
   border: 1px solid rgba(255, 255, 255, 0.2);
   background: rgba(0, 0, 0, 0.7);
   color: white;
-  transition: transform 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .carousel-button:hover {
